@@ -1,0 +1,29 @@
+
+@if(orderResource.status()=== 'error'){
+    <p data-testid="order-error">Error: {{orderErrorStatus()}}</p>
+}
+@if(orderResource.status()=== 'idle'){
+    <p data-testid="order-idle">Enter an order id</p>
+} @else if (orderResource.status()=== 'loading') {
+    <p data-testid="order-loading">Loading...</p>
+} @else if (orderResource.hasValue()) {
+    <p data-testid="order-status">{{orderResource.value()?.status}}</p>
+    <p data-testid="order-total">${{orderResource.value()?.total}}</p>
+     @if (orderResource.status() === 'reloading') {
+    <span data-testid="order-refreshing">Refreshing…</span>
+  }
+
+
+     @if(customerResource.status()=== 'idle'){
+          <div data-testid="customer-idle">Enter an order id</div>
+        }
+    @else if (customerResource.status()=== 'loading') {
+          <div data-testid="customer-loading">Loading customer...</div>
+        } 
+         @else if (customerResource.status()=== 'error') {
+          <div data-testid="customer-error">Customer error</div>
+        } @else if (customerResource.hasValue()) {
+          <div data-testid="customer-name">{{ customerResource.value()!.name }}</div>
+        }
+}
+<button data-testid="order-reload" (click)="orderResource.reload()">Reload</button>

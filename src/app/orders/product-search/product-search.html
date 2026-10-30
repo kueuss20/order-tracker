@@ -1,0 +1,12 @@
+@if (productResource.status() === 'idle') {
+  <p data-testid="search-idle">Type to search.</p>
+} @else if (productResource.status() === 'loading') {
+  <p data-testid="search-loading">Searching…</p>
+} @else if (productResource.status() === 'error') {
+  <p data-testid="search-error">Search failed.</p>
+} @else if (productResource.hasValue()) {
+  <p data-testid="search-count">{{ productResource.value().length }}</p>
+  @for (product of productResource.value(); track product.sku) {
+    <div data-testid="search-result">{{ product.name }} — {{ product.price }}</div>
+  }
+}

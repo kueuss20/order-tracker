@@ -1,59 +1,7 @@
-# OrderTracker
+1 (undefined vs { id: undefined }): Returning undefined puts the whole resource in idle — loader never runs, zero network requests. Returning { id: undefined } makes the resource think there's a request, loader runs, unexpected request fires. The customer resource must use the former: if (!orderResource.hasValue()) return undefined;, not { customerId: orderResource.value()?.customerId }.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+Q2 (value() throws in error state; isLoading() is not a safe guard): value() deliberately throws in the error state; hasValue() is the only precondition that both narrows the type and protects at runtime. isLoading() only reflects whether the loader is running — it cannot exclude the error state and does not guarantee value() is safe.
 
-## Development server
+Q3 (what happens to the in-flight fetch when query changes): Angular uses abortSignal to abort the running loader; only by passing abortSignal to fetch is the network request actually cancelled (signal.aborted === true). Without it, the old request keeps running and its result is merely discarded — no network-level cancellation.
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Q4 (loading vs reloading): loading means no old value; value() is undefined; show order-loading. reloading means a value already exists; value() keeps the old value; hasValue() stays true; keep rendering old status/total and additionally show order-refreshing. Treating reloading as loading causes flicker
